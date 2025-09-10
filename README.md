@@ -35,35 +35,35 @@ graph TB
     %% API Layer
     subgraph "API Layer - Fastify Server :3333"
         FASTIFY[Fastify Instance]
-        SWAGGER[Swagger/OpenAPI Docs<br>/docs]
+        SWAGGER["Swagger/OpenAPI Docs (/docs)"]
         LOGGER[Pino Logger]
-        MIDDLEWARE[Type Provider<br>fastify-zod]
+        MIDDLEWARE["Type Provider (fastify-zod)"]
     end
     
     %% Route Layer
     subgraph "Route Layer"
-        CREATE[POST /courses<br>Create Course]
-        GET_ALL[GET /courses<br>List Courses]
-        GET_BY_ID[GET /courses/:id<br>Get Course by ID]
+        CREATE["POST /courses (Create Course)"]
+        GET_ALL["GET /courses (List Courses)"]
+        GET_BY_ID["GET /courses/:id (Get Course by ID)"]
     end
     
     %% Validation Layer
     subgraph "Validation Layer"
-        ZOD_CREATE[Zod Schema<br>title: string.min(3)]
-        ZOD_PARAMS[Zod Schema<br>id: uuid()]
-        ZOD_RESPONSE[Response Validation<br>201/200/404]
+        ZOD_CREATE["Zod Schema (title: string.min(3))"]
+        ZOD_PARAMS["Zod Schema (id: uuid())"]
+        ZOD_RESPONSE["Response Validation (201/200/404)"]
     end
     
     %% Data Layer
     subgraph "Data Access Layer"
-        DRIZZLE[Drizzle ORM<br>Query Builder]
-        SCHEMA[Database Schema<br>courses table]
+        DRIZZLE["Drizzle ORM (Query Builder)"]
+        SCHEMA["Database Schema (courses table)"]
     end
     
     %% Database Layer
     subgraph "Database Layer"
-        POSTGRES[(PostgreSQL<br>school_db)]
-        MIGRATIONS[Migration Files<br>./drizzle/*.sql]
+        POSTGRES[("PostgreSQL (school_db)")]
+        MIGRATIONS["Migration Files (./drizzle/*.sql)"]
     end
     
     %% Flow connections
