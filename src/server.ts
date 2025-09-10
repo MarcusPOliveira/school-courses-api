@@ -1,14 +1,16 @@
 import fastify from 'fastify'
-import { eq } from 'drizzle-orm'
 import {
   validatorCompiler,
   serializerCompiler,
   type ZodTypeProvider,
+  jsonSchemaTransform,
 } from 'fastify-type-provider-zod'
-import { z } from 'zod'
+import { fastifySwagger } from '@fastify/swagger'
+import { fastifySwaggerUi } from '@fastify/swagger-ui'
 
-import { db } from './database/client.ts'
-import { courses } from './database/schema.ts'
+import { createCourseRoute } from './routes/create-course.ts'
+import { getCourseByIdRoute } from './routes/get-course-by-id.ts'
+import { getCoursesRoute } from './routes/get-courses.ts'
 
 const server = fastify({
   logger: {
@@ -22,67 +24,27 @@ const server = fastify({
   },
 }).withTypeProvider<ZodTypeProvider>()
 
+server.register(fastifySwagger, {
+  openapi: {
+    info: {
+      title: 'School API',
+      description: 'API para gerenciar cursos',
+      version: '1.0.0',
+    },
+  },
+  transform: jsonSchemaTransform,
+})
+
+server.register(fastifySwaggerUi, {
+  routePrefix: '/docs',
+})
+
 server.setSerializerCompiler(serializerCompiler)
 server.setValidatorCompiler(validatorCompiler)
 
-server.get('/courses', async (request, reply) => {
-  const result = await db
-    .select({
-      id: courses.id,
-      title: courses.title,
-    })
-    .from(courses)
-
-  return reply.send({ courses: result })
-})
-
-server.get(
-  '/courses/:id',
-  {
-    schema: {
-      params: z.object({
-        id: z.uuid(),
-      }),
-    },
-  },
-  async (request, reply) => {
-    const courseId = request.params.id
-
-    const result = await db
-      .select()
-      .from(courses)
-      .where(eq(courses.id, courseId))
-
-    if (result.length > 0) {
-      return { course: result[0] }
-    }
-
-    return reply.status(404).send()
-  },
-)
-
-server.post(
-  '/courses',
-  {
-    schema: {
-      body: z.object({
-        title: z.string().min(3, 'O título deve ter no mínimo 3 caracteres'),
-      }),
-    },
-  },
-  async (request, reply) => {
-    const courseTitle = request.body.title
-
-    const result = await db
-      .insert(courses)
-      .values({
-        title: courseTitle,
-      })
-      .returning()
-
-    return reply.status(201).send({ courseId: result[0].id })
-  },
-)
+server.register(createCourseRoute)
+server.register(getCourseByIdRoute)
+server.register(getCoursesRoute)
 
 server.listen({ port: 3333 }).then(() => {
   console.log('Server is running on http://localhost:3333')
