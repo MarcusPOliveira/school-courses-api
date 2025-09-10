@@ -6,7 +6,7 @@ import {
   jsonSchemaTransform,
 } from 'fastify-type-provider-zod'
 import { fastifySwagger } from '@fastify/swagger'
-import { fastifySwaggerUi } from '@fastify/swagger-ui'
+import scalarAPIReference from '@scalar/fastify-api-reference'
 
 import { createCourseRoute } from './routes/create-course.ts'
 import { getCourseByIdRoute } from './routes/get-course-by-id.ts'
@@ -24,20 +24,25 @@ const server = fastify({
   },
 }).withTypeProvider<ZodTypeProvider>()
 
-server.register(fastifySwagger, {
-  openapi: {
-    info: {
-      title: 'School API',
-      description: 'API para gerenciar cursos',
-      version: '1.0.0',
+if (process.env.NODE_ENV === 'development') {
+  server.register(fastifySwagger, {
+    openapi: {
+      info: {
+        title: 'School API',
+        description: 'API para gerenciar cursos',
+        version: '1.0.0',
+      },
     },
-  },
-  transform: jsonSchemaTransform,
-})
+    transform: jsonSchemaTransform,
+  })
 
-server.register(fastifySwaggerUi, {
-  routePrefix: '/docs',
-})
+  server.register(scalarAPIReference, {
+    routePrefix: '/docs',
+    configuration: {
+      theme: 'kepler',
+    },
+  })
+}
 
 server.setSerializerCompiler(serializerCompiler)
 server.setValidatorCompiler(validatorCompiler)
