@@ -4,6 +4,7 @@ import { and, asc, ilike, SQL } from 'drizzle-orm'
 
 import { db } from '../database/client.ts'
 import { courses } from '../database/schema.ts'
+import { constants } from '../constants/index.ts'
 
 export const getCoursesRoute: FastifyPluginAsyncZod = async (server) => {
   server.get(
@@ -48,7 +49,7 @@ export const getCoursesRoute: FastifyPluginAsyncZod = async (server) => {
           .from(courses)
           .orderBy(asc(courses[orderBy]))
           .offset((page - 1) * 2)
-          .limit(2)
+          .limit(constants.ITEMS_PER_PAGE)
           .where(and(...conditions)),
 
         db.$count(courses, and(...conditions)),
