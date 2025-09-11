@@ -14,6 +14,7 @@ export const courses = pgTable('courses', {
 
 // Relation N-N between users and courses, so need a pivot table:
 export const enrollments = pgTable('enrollments', {
+  id: uuid().primaryKey().defaultRandom(),
   userId: uuid()
     .notNull()
     .references(() => users.id),
