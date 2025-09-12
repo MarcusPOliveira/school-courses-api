@@ -36,6 +36,13 @@
       "when": 1757558081149,
       "tag": "0004_next_lethal_legion",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1757693774637,
+      "tag": "0005_same_songbird",
+      "breakpoints": true
     }
   ]
 }
