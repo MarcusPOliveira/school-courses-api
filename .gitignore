@@ -5,3 +5,5 @@ build
 # Environment files
 .env*
 !.env*.example
+
+coverage/
