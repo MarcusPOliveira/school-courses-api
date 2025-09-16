@@ -2,6 +2,7 @@ import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod'
 import z from 'zod'
 import { eq } from 'drizzle-orm'
 import { verify } from 'argon2'
+import jwt from 'jsonwebtoken'
 
 import { db } from '../database/client.ts'
 import { users } from '../database/schema.ts'
@@ -19,11 +20,14 @@ export const loginRoute: FastifyPluginAsyncZod = async (server) => {
             .string()
             .min(6, 'A senha deve ter no mínimo 6 caracteres'),
         }),
-        // response: {
-        //   201: z.object({
-
-        //   }),
-        // },
+        response: {
+          200: z.object({
+            token: z.string(),
+          }),
+          400: z.object({
+            message: z.string(),
+          }),
+        },
       },
     },
     async (request, reply) => {
@@ -47,8 +51,17 @@ export const loginRoute: FastifyPluginAsyncZod = async (server) => {
         })
       }
 
+      if (!process.env.JWT_SECRET) {
+        throw new Error('JWT_SECRET must be set')
+      }
+
+      const token = jwt.sign(
+        { subject: user.id, role: user.role },
+        process.env.JWT_SECRET,
+      )
+
       return reply.status(200).send({
-        message: 'Ok',
+        token,
       })
     },
   )
